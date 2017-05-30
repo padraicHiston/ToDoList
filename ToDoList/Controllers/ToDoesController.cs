@@ -14,6 +14,7 @@ namespace ToDoList.Controllers
         // GET: ToDoes
         public ActionResult Index()
         {
+            // The following three lines of code have limit the ToDo list itmes that a user can view. They can now only see the items that they have created themselves.
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser currentUser = db.Users.FirstOrDefault
                 (u => u.Id == currentUserId);

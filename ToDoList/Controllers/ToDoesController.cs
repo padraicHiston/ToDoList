@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -14,20 +15,20 @@ namespace ToDoList.Controllers
         // GET: ToDoes
         public ActionResult Index()
         {
-            // The following three lines of code have limit the ToDo list itmes that a user can view. They can now only see the items that they have created themselves.
-            string currentUserId = User.Identity.GetUserId();
-            ApplicationUser currentUser = db.Users.FirstOrDefault
-                (u => u.Id == currentUserId);
-            return View(db.ToDos.ToList().Where(t => t.User == currentUser));
+            return View();
         }
 
-        public ActionResult BuildToDoTable()
+        private IEnumerable<ToDo> GetMyToDoes()
         {
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser currentUser = db.Users.FirstOrDefault
                 (u => u.Id == currentUserId);
-            return PartialView("_ToDoTable", 
-                db.ToDos.ToList().Where(t => t.User == currentUser));
+            return db.ToDos.ToList().Where(t => t.User == currentUser);
+        }
+
+        public ActionResult BuildToDoTable()
+        {
+            return PartialView("_ToDoTable", GetMyToDoes());
         }
 
         // GET: ToDoes/Details/5
@@ -71,6 +72,25 @@ namespace ToDoList.Controllers
             }
 
             return View(toDo);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AJAXCreate([Bind(Include = "Id,Description")] ToDo toDo)
+        {
+            if (ModelState.IsValid)
+            {
+                // The following four lines of code links the todo item to the user creating it.
+                string currentUserId = User.Identity.GetUserId();
+                ApplicationUser currentUser = db.Users.FirstOrDefault
+                    (u => u.Id == currentUserId);
+                toDo.User = currentUser;
+                toDo.IsDone = false;
+                db.ToDos.Add(toDo);
+                db.SaveChanges();
+            }
+
+            return PartialView("_ToDoTable", GetMyToDoes());
         }
 
         // GET: ToDoes/Edit/5

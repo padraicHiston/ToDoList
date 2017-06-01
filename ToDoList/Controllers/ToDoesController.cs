@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.Identity;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -23,7 +24,21 @@ namespace ToDoList.Controllers
             string currentUserId = User.Identity.GetUserId();
             ApplicationUser currentUser = db.Users.FirstOrDefault
                 (u => u.Id == currentUserId);
-            return db.ToDos.ToList().Where(t => t.User == currentUser);
+
+            IEnumerable<ToDo> myToDoes = db.ToDos.ToList().Where(t => t.User == currentUser);
+
+            int completeCount = 0;
+            foreach (ToDo toDo in myToDoes)
+            {
+                if (toDo.IsDone)
+                {
+                    completeCount++;
+                }
+            }
+
+            ViewBag.Percent = Math.Round(100f * ((float)completeCount / (float)myToDoes.Count()));
+
+            return myToDoes;
         }
 
         public ActionResult BuildToDoTable()

@@ -6,14 +6,14 @@
         var value = self.prop("checked");
 
         $.ajax({
-            url: "/ToDoes/AJAXEdit",
+            url: '/ToDoes/AJAXEdit',
             data: {
                 id: id,
                 value: value
             },
             type: "POST",
             success: function (result) {
-                $("~tableDiv").html(result);
+                $('#tableDiv').html(result);
             }
 
         });

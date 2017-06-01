@@ -23,3 +23,9 @@ textarea {
     max-width: 280px;
 }
 
+/* Styling for completed ToDo list items*/
+
+.CompletedToDo {
+    text-decoration: line-through;
+}
+
